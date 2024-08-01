@@ -26,20 +26,18 @@ In the initial data preparation phase, I performed the following:
 
 ### Hypotheses:
 
-My data analysis involved exploring the following hypotheses:
-
-1. Price would be strongly and positively correlated with square feet, condition,
-2. Non-linear regression: PM2.5 concentration (variable measuring air pollution) will have a non-linear relationship to the remaining variables in the data set.
+My data analysis involved exploring the hypothesis that the prices of the homes would be strongly and positively correlated with square feet, condition, bedroom/bathroom/floor counts, view, and the city that the homes are located.
 
 ### Data Analysis
 
-The following code generates a scatter plot illustrating the relationship between temperature and pressure, with a blue linear regression line overlaid. There is a negative correlation here.
+The following code separated the state and zip code data from "statezip" into 2 distinct columns.
 
 ```python
-sns.regplot(x="TEMP", y="PRES", data=df, scatter_kws={"color": "red"}, line_kws={"color":"blue"})
+df['state'] = df['statezip'].astype(str).str[:2]
+df['zip'] = df['statezip'].astype(str).str[2:]
 ```
 
-The following code generates a heat map that provides the correlation direction and strength across all variables in the data set. I converted "combined wind direction" from object type to numerical categories in order to include it in the heat map.
+The following code generates a heat map that provides the correlation direction and strength across all variables in the data set. I converted variables of type "object" to numerical categories in order to include them in the correlations.
 
 ```python
 df_numerized = df
@@ -47,29 +45,30 @@ for col_name in df_numerized.columns:
     if(df_numerized[col_name].dtype == 'object'):
         df_numerized[col_name] = df_numerized[col_name].astype('category')
         df_numerized[col_name] = df_numerized[col_name].cat.codes
+
 correlation_matrix = df_numerized.corr()
 sns.heatmap(correlation_matrix, annot=True)
 
 plt.title("Correlation Matrix")
-plt.xlabel("Air Quality Factors")
-plt.ylabel("Air Quality Factors")
+plt.xlabel("US Home Variables")
+plt.ylabel("US Home Variables")
 plt.show()
 ```
 
 ### Results/Findings
 
-The analysis results are summarized as follows:
-1. Temperature, pressure and dew point are all strongly, linearly correlated. As temperature and dew point increase, pressure decreases.
-2. The correlations between environmental factors and air pollution, measured as PM2.5 concentration, appear to be strong, non-linear correlations. They do not appear to be strongly related on the heat map, because they are not linearly correlated.
+As I created scatter plots, I realized that my hypothesis was not holding up. Price's strongest correlations were with sqft_living, sqft_above, and number of bathrooms, but these correlations were not very strong, falling slightly below .5. The strongest correlations overall did not include price. Sqft_above and sqft_living had a strong correlation of 0.874881. Number of bathrooms and sqft_living had a strong correlation of 0.760353. Lastly, sqft_above and bathrooms had a correlation of 0.687679. Thus, the variables measuring size/square feet all seem to be correlated, which makes sense.
 
 ### Implications/Recommendations:
 
-If this project were for the purpose of reducing pollution in Beijing, I would continue my analysis by further exploring the strong, non-linear relationships associated with PM2.5 concentration. The goal would be to determine what factor(s) most impact PM2.5 levels and then figure out how to indirectly influence these variables (via legislation, systemic change, etc.) to decrease PM2.5 levels. Determining how to manipulate the environmental factors that influence PM2.5 concentration would require further analysis on these variables.
+If this project were for the purpose of pricing a home, I would apply the findings from the moderate correlation between price and square feet/number of bathrooms. I would use square feet as a base for the price, and then adjust it based on all of the other aspects of a home that add value. In order to understand the degree of value that other variables add to a home, I would want to look at data over a longer period of time in Washington. I would also add external factors to measure such as distances from a school and a grocery store.
 
 ### Limitations
 
-There were a few limitations within this data set. One limitation was that each row (apartment) included in a multi-sale transaction did not report the individual sale price for that apartment, but rather the sale price for all of the apartments in the multi-sale transaction. This resulted in an inflated sale volume when analyzing the data. Although I was able to control for some of these transactions, others were not controlled for if the transactions did not close on the same day, in the same building, or if the same building address was written differently for different apartments. Therefore, it is important to note that these numbers might be slightly inflated across all boroughs. I mostly included this field in my analysis to understand how boroughs ranked against each other, rather than to determine accurate sale prices. Additionally, I intended to only analyze residential buildings, but the building categories included in the data set did not fully separate residential and commercial buildings. This fact also may be contributing to inflated sales volume, since commercial listings are often more expensive. Since I was mainly looking for trends and practicing my SQL skills, I continued on with my analysis. If I were to actually use this data set with a client, I would focus on a smaller section of the data, making sure to go through and completely control for the multi-sale transactions and remove all commercial buildings.
+There were a few limitations within this data set. One limitation was that this data is 10 years old, and it spanned a very narrow time frame from May - July months. Therefore, we do not get a sense of how seasonality affects pricing.
+
+each row (apartment) included in a multi-sale transaction did not report the individual sale price for that apartment, but rather the sale price for all of the apartments in the multi-sale transaction. This resulted in an inflated sale volume when analyzing the data. Although I was able to control for some of these transactions, others were not controlled for if the transactions did not close on the same day, in the same building, or if the same building address was written differently for different apartments. Therefore, it is important to note that these numbers might be slightly inflated across all boroughs. I mostly included this field in my analysis to understand how boroughs ranked against each other, rather than to determine accurate sale prices. Additionally, I intended to only analyze residential buildings, but the building categories included in the data set did not fully separate residential and commercial buildings. This fact also may be contributing to inflated sales volume, since commercial listings are often more expensive. Since I was mainly looking for trends and practicing my SQL skills, I continued on with my analysis. If I were to actually use this data set with a client, I would focus on a smaller section of the data, making sure to go through and completely control for the multi-sale transactions and remove all commercial buildings.
 
 ### References
 
-1. [Data.gov](https://data.gov/)
+1. [kaggle.com](https://data.gov/)
